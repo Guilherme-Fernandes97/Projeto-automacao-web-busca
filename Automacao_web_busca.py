@@ -8,12 +8,20 @@ nav = webdriver.Chrome()
 
 #importar/visualizar a base de dados
 tabela_produtos = pd.read_excel('buscas.xlsx')
-print(tabela_produtos)
 
 
 #entrar no google
 nav.get('https://www.google.com/')
-produto = 'iphone 12 64gb'
+
+produto = 'iphone 12 64 gb'
+termos_banidos = 'mini watch'
+
+produto = produto.lower()
+termos_banidos = termos_banidos.lower()
+lista_termos_banidos = termos_banidos.split(" ")
+lista_termos_produto = produto.split(" ")
+preco_minimo = 3000
+preco_maximo = 3500
 
 #pesquisar o nome do produto no google
 nav.find_element(By.XPATH, '/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/input').send_keys(produto)
@@ -26,15 +34,40 @@ for item in elementos:
         item.click()
         break
 
-lista_resultados = nav.find_elements(By.CLASS_NAME, 'KZmu8e')
+lista_resultados = nav.find_elements(By.CLASS_NAME, 'i0X6df')
 
 for resultado in lista_resultados:
-    preco = resultado.find_element(By.CLASS_NAME, 'T14wmb').text
-    nome = resultado.find_element(By.CLASS_NAME, 'ljqwrc').text
-    elemento_link = resultado.find_element(By.CLASS_NAME, 'HUOptb')
-    elemento_pai = elemento_link.find_element(By.XPATH, '..')
-    link = elemento_pai.get_attribute('href')
-    print(preco, nome, link)
+
+    nome = resultado.find_element(By.CLASS_NAME, 'Xjkr3b').text
+    nome = nome.lower()
+
+    #verificação de nome
+    tem_termos_banidos = False
+    for palavra in lista_termos_banidos:
+        if palavra in nome:
+            tem_termos_banidos = True
+
+    tem_todos_termos_produtos = True
+    for palavra in lista_termos_produto:
+        if palavra not in nome:
+            tem_todos_termos_produtos = False
+
+    if not tem_termos_banidos and tem_todos_termos_produtos:
+        preco = resultado.find_element(By.CLASS_NAME, 'kHxwFf').text
+        preco = preco.replace("R$", "").replace(" ", "").replace(".", "").replace(",", ".")
+        preco = str(preco[:5])
+        preco = float(preco)
+
+        preco_maximo = float(preco_maximo)
+        preco_minimo = float(preco_minimo)
+        if preco_minimo <= preco <= preco_maximo:
+            elemento_link = resultado.find_element(By.CLASS_NAME, 'EI11Pd')
+            elemento_pai = elemento_link.find_element(By.XPATH, '..')
+            link = elemento_pai.get_attribute('href')
+            print(nome, preco, link)
+
+
+
 
 
 
