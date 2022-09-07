@@ -18,8 +18,29 @@ produto = 'iphone 12 64gb'
 #pesquisar o nome do produto no google
 nav.find_element(By.XPATH, '/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/input').send_keys(produto)
 nav.find_element(By.XPATH, '/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/input').send_keys(Keys.ENTER)
+
 #clicar na aba shopping
-nav.find_element(By.XPATH, '//*[@id="hdtb-msb"]/div[1]/div/div[2]/a').click()
+elementos = nav.find_elements(By.CLASS_NAME, 'hdtb-mitem')
+for item in elementos:
+    if "Shopping" in item.text:
+        item.click()
+        break
+
+lista_resultados = nav.find_elements(By.CLASS_NAME, 'KZmu8e')
+
+for resultado in lista_resultados:
+    preco = resultado.find_element(By.CLASS_NAME, 'T14wmb').text
+    nome = resultado.find_element(By.CLASS_NAME, 'ljqwrc').text
+    elemento_link = resultado.find_element(By.CLASS_NAME, 'HUOptb')
+    elemento_pai = elemento_link.find_element(By.XPATH, '..')
+    link = elemento_pai.get_attribute('href')
+    print(preco, nome, link)
+
+
+
+
+#for elemento_preco in lista_precos:
+
 #pegar o preço do produto no shopping
 
 
